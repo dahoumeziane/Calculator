@@ -12,17 +12,16 @@ class MainActivity : AppCompatActivity() {
     var SECOND_OPERAND = 0.0
     var OPERATION_CLICKED = false
     var TYPING = false
-    lateinit var OPERATIONS : ArrayList<HistoryModel>
+    var OPERATIONS = ArrayList<HistoryModel>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         initButtons()
-        OPERATIONS= ArrayList()
-        calculation_history.adapter=HistoryAdapter(OPERATIONS,this)
         val manager = LinearLayoutManager(this)
-        manager.reverseLayout = true
-        //manager.stackFromEnd=true
-        calculation_history.layoutManager = manager
+        manager.reverseLayout=true
+        calculation_history.layoutManager= manager
+        calculation_history.adapter = HistoryAdapter(OPERATIONS,this)
     }
 
     fun initButtons() {
@@ -140,9 +139,9 @@ class MainActivity : AppCompatActivity() {
             SECOND_OPERAND = result.text.toString().toDouble()
             if (TYPING) {
                 OPERATIONS.add(HistoryModel("${GLOBAL_RESULT}+${SECOND_OPERAND}"))
-                calculation_history.adapter!!.notifyDataSetChanged()
                 GLOBAL_RESULT += SECOND_OPERAND
-                result.text = "${GLOBAL_RESULT}"
+                displayResult()
+
                 TYPING = false
             }
 
@@ -150,36 +149,36 @@ class MainActivity : AppCompatActivity() {
             SECOND_OPERAND = result.text.toString().toDouble()
             if (TYPING) {
                 OPERATIONS.add(HistoryModel("${GLOBAL_RESULT}-${SECOND_OPERAND}"))
-                calculation_history.adapter!!.notifyDataSetChanged()
                 GLOBAL_RESULT -= SECOND_OPERAND
-                result.text = "${GLOBAL_RESULT}"
+                displayResult()
                 TYPING = false
             }
         }else if (CURRENT_OPERATION=="/"){
-            OPERATIONS.add(HistoryModel("${GLOBAL_RESULT}/${SECOND_OPERAND}"))
-            calculation_history.adapter!!.notifyDataSetChanged()
+
             SECOND_OPERAND = result.text.toString().toDouble()
             if (TYPING) {
                 if(SECOND_OPERAND==0.0){
                     result.text = "ERROR"
                     GLOBAL_RESULT=0.0
                 }else{
+                    OPERATIONS.add(HistoryModel("${GLOBAL_RESULT}/${SECOND_OPERAND}"))
                     GLOBAL_RESULT /= SECOND_OPERAND
-                    result.text = "${GLOBAL_RESULT}"
+                    displayResult()
                     TYPING = false
                 }
 
             }
         }else if (CURRENT_OPERATION=="*"){
-            OPERATIONS.add(HistoryModel("${GLOBAL_RESULT}x${SECOND_OPERAND}"))
-            calculation_history.adapter!!.notifyDataSetChanged()
+
             SECOND_OPERAND = result.text.toString().toDouble()
             if (TYPING) {
+                OPERATIONS.add(HistoryModel("${GLOBAL_RESULT}x${SECOND_OPERAND}"))
                 GLOBAL_RESULT *= SECOND_OPERAND
-                result.text = "${GLOBAL_RESULT}"
+                displayResult()
                 TYPING = false
             }
         }
+        calculation_history.adapter?.notifyDataSetChanged()
 
 
 
@@ -213,10 +212,9 @@ class MainActivity : AppCompatActivity() {
                     result.text=result.text.toString().replace("-","")
                 }else{
                     result.text = "-${result.text}"
-                    if(GLOBAL_RESULT!=0.0){
-                        GLOBAL_RESULT=-GLOBAL_RESULT
-                    }
-
+                }
+                if(GLOBAL_RESULT!=0.0){
+                    GLOBAL_RESULT=-GLOBAL_RESULT
                 }
             }
         }
@@ -231,5 +229,12 @@ class MainActivity : AppCompatActivity() {
         }
 
 
+    }
+    fun displayResult(){
+        if(GLOBAL_RESULT.toString().endsWith(".0")){
+            result.text = "${GLOBAL_RESULT.toInt()}"
+        }else{
+            result.text = "${GLOBAL_RESULT}"
+        }
     }
 }
