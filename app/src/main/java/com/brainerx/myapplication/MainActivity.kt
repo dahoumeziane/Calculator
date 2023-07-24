@@ -2,6 +2,7 @@ package com.brainerx.myapplication
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -11,11 +12,17 @@ class MainActivity : AppCompatActivity() {
     var SECOND_OPERAND = 0.0
     var OPERATION_CLICKED = false
     var TYPING = false
-
+    lateinit var OPERATIONS : ArrayList<HistoryModel>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         initButtons()
+        OPERATIONS= ArrayList()
+        calculation_history.adapter=HistoryAdapter(OPERATIONS,this)
+        val manager = LinearLayoutManager(this)
+        manager.reverseLayout = true
+        //manager.stackFromEnd=true
+        calculation_history.layoutManager = manager
     }
 
     fun initButtons() {
@@ -132,6 +139,8 @@ class MainActivity : AppCompatActivity() {
         if (CURRENT_OPERATION == "+") {
             SECOND_OPERAND = result.text.toString().toDouble()
             if (TYPING) {
+                OPERATIONS.add(HistoryModel("${GLOBAL_RESULT}+${SECOND_OPERAND}"))
+                calculation_history.adapter!!.notifyDataSetChanged()
                 GLOBAL_RESULT += SECOND_OPERAND
                 result.text = "${GLOBAL_RESULT}"
                 TYPING = false
@@ -140,11 +149,15 @@ class MainActivity : AppCompatActivity() {
         }else if (CURRENT_OPERATION== "-"){
             SECOND_OPERAND = result.text.toString().toDouble()
             if (TYPING) {
+                OPERATIONS.add(HistoryModel("${GLOBAL_RESULT}-${SECOND_OPERAND}"))
+                calculation_history.adapter!!.notifyDataSetChanged()
                 GLOBAL_RESULT -= SECOND_OPERAND
                 result.text = "${GLOBAL_RESULT}"
                 TYPING = false
             }
         }else if (CURRENT_OPERATION=="/"){
+            OPERATIONS.add(HistoryModel("${GLOBAL_RESULT}/${SECOND_OPERAND}"))
+            calculation_history.adapter!!.notifyDataSetChanged()
             SECOND_OPERAND = result.text.toString().toDouble()
             if (TYPING) {
                 if(SECOND_OPERAND==0.0){
@@ -158,6 +171,8 @@ class MainActivity : AppCompatActivity() {
 
             }
         }else if (CURRENT_OPERATION=="*"){
+            OPERATIONS.add(HistoryModel("${GLOBAL_RESULT}x${SECOND_OPERAND}"))
+            calculation_history.adapter!!.notifyDataSetChanged()
             SECOND_OPERAND = result.text.toString().toDouble()
             if (TYPING) {
                 GLOBAL_RESULT *= SECOND_OPERAND
